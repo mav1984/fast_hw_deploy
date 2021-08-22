@@ -4,8 +4,9 @@ import shutil
 import zipfile
 from distutils.dir_util import copy_tree
 
-# Absolute path to download folder with the slash at the end
-DOWNLOAD_FOLDER = '...'  # e.g. '/home/anton/Загрузки/'
+# Absolute path to download folder with the slash at the end.
+# e.g. '/home/anton/Загрузки/' or 'C:\\Users\\Антон\\Downloads\\'
+DOWNLOAD_FOLDER = '...'
 REMOVE_ZIP_FROM_DOWNLOADS = False
 
 # You can change it if you want
@@ -57,7 +58,8 @@ def extract_yatube_folder(project_dir: str):
 
     archive = zipfile.ZipFile(archive_path)
     for archive_item in archive.namelist():
-        if (os.sep + YATUBE_FOLDER + os.sep) in archive_item:
+        # Archive namelist has `/` even in Win.
+        if f'/{YATUBE_FOLDER}/' in archive_item:
             extracted_obj_path = archive.extract(archive_item, project_dir)
 
     if extracted_obj_path is None:
@@ -87,6 +89,8 @@ def add_style_tag(project_dir: str):
 
     def find_base():
         for root, dirs, files in os.walk(project_dir):
+            if YATUBE_FOLDER not in root:
+                continue
             if 'base.html' in files:
                 return os.path.join(root, 'base.html')
 
